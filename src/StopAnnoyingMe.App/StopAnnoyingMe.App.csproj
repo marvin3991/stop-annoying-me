@@ -1,15 +1,41 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\StopAnnoyingMe.Core\StopAnnoyingMe.Core.csproj" />
-  </ItemGroup>
-
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <!-- 系統匣圖示用 WinForms 的 NotifyIcon，免第三方套件 -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>StopAnnoyingMe</AssemblyName>
+    <RootNamespace>StopAnnoyingMe.App</RootNamespace>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <Product>打擾記錄器</Product>
+    <AssemblyTitle>打擾記錄器</AssemblyTitle>
+    <Description>上班被打擾時一鍵記錄時間並統計次數</Description>
+    <Version>1.0.0</Version>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StopAnnoyingMe.Core\StopAnnoyingMe.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      同時啟用 WPF 與 WinForms 會讓 Application、MessageBox、KeyEventArgs、Brush 等型別撞名。
+      這是 WPF 專案，全域拿掉 WinForms 與 GDI+ 的 using：
+      只有系統匣相關的兩支檔案需要它們，在該檔案內自行引用即可。
+      另外 WinForms 的隱含 using 組合不含 System.IO，這裡補回來。
+    -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <Using Include="System.IO" />
+  </ItemGroup>
 
 </Project>

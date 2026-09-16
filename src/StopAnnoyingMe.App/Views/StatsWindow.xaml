@@ -1,0 +1,199 @@
+﻿<Window
+    x:Class="StopAnnoyingMe.App.Views.StatsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="統計"
+    Width="520"
+    Height="520"
+    Icon="../Assets/app.ico"
+    ShowInTaskbar="False"
+    Style="{StaticResource Style.Window.Dialog}"
+    WindowStartupLocation="CenterOwner">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="44" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="16,0,6,0">
+            <TextBlock
+                VerticalAlignment="Center"
+                Style="{StaticResource Style.Text.Body}"
+                Text="統計" />
+            <Button
+                HorizontalAlignment="Right"
+                Click="OnCloseClick"
+                Style="{StaticResource Style.Button.Icon}"
+                ToolTip="關閉">
+                <Path
+                    Data="{StaticResource Geometry.Close}"
+                    Stretch="None"
+                    Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                    StrokeEndLineCap="Round"
+                    StrokeStartLineCap="Round"
+                    StrokeThickness="1.6" />
+            </Button>
+        </Grid>
+
+        <!--  四個期間的累計次數  -->
+        <UniformGrid
+            Grid.Row="1"
+            Margin="16,8,16,0"
+            Columns="4">
+            <Border Margin="0,0,6,0" Padding="12,10" Style="{StaticResource Style.Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Style.Text.Muted}" Text="今日" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        Style="{StaticResource Style.Text.Title}"
+                        Text="{Binding TodayText}" />
+                </StackPanel>
+            </Border>
+            <Border Margin="3,0,3,0" Padding="12,10" Style="{StaticResource Style.Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Style.Text.Muted}" Text="本週" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        Style="{StaticResource Style.Text.Title}"
+                        Text="{Binding WeekText}" />
+                </StackPanel>
+            </Border>
+            <Border Margin="3,0,3,0" Padding="12,10" Style="{StaticResource Style.Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Style.Text.Muted}" Text="本月" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        Style="{StaticResource Style.Text.Title}"
+                        Text="{Binding MonthText}" />
+                </StackPanel>
+            </Border>
+            <Border Margin="6,0,0,0" Padding="12,10" Style="{StaticResource Style.Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Style.Text.Muted}" Text="累計" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        Style="{StaticResource Style.Text.Title}"
+                        Text="{Binding TotalText}" />
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!--  期間切換  -->
+        <StackPanel
+            Grid.Row="2"
+            Margin="16,14,16,0"
+            Orientation="Horizontal">
+            <Button
+                x:Name="TodayChip"
+                Margin="0,0,6,0"
+                Click="OnPeriodClick"
+                Content="今日"
+                Style="{StaticResource Style.Button.Chip}"
+                Tag="Selected" />
+            <Button
+                x:Name="WeekChip"
+                Margin="0,0,6,0"
+                Click="OnPeriodClick"
+                Content="本週"
+                Style="{StaticResource Style.Button.Chip}" />
+            <Button
+                x:Name="MonthChip"
+                Click="OnPeriodClick"
+                Content="本月"
+                Style="{StaticResource Style.Button.Chip}" />
+            <TextBlock
+                Margin="12,0,0,0"
+                VerticalAlignment="Center"
+                Style="{StaticResource Style.Text.Muted}"
+                Text="{Binding RangeText}" />
+        </StackPanel>
+
+        <!--  時段分佈  -->
+        <Border
+            Grid.Row="3"
+            Margin="16,12,16,0"
+            Padding="14,12"
+            Style="{StaticResource Style.Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Style="{StaticResource Style.Text.Muted}"
+                    Text="時段分佈（每小時）" />
+
+                <ItemsControl
+                    Grid.Row="1"
+                    Height="140"
+                    Margin="0,10,0,0"
+                    VerticalAlignment="Bottom"
+                    ItemsSource="{Binding Hours}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="24" Rows="1" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Background="Transparent" ToolTip="{Binding Tooltip}">
+                                <Rectangle
+                                    Margin="1.5,0"
+                                    Height="{Binding BarHeight}"
+                                    Style="{StaticResource Style.Bar}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ItemsControl
+                    Grid.Row="2"
+                    Margin="0,4,0,0"
+                    ItemsSource="{Binding Hours}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="24" Rows="1" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                Style="{StaticResource Style.Text.Muted}"
+                                Text="{Binding AxisLabel}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock
+                    Grid.Row="3"
+                    Margin="0,10,0,0"
+                    Style="{StaticResource Style.Text.Caption}"
+                    Text="{Binding PeakText}" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="4" Margin="16,14,16,16">
+            <Button
+                HorizontalAlignment="Left"
+                Click="OnExportClick"
+                Content="匯出 CSV"
+                Style="{StaticResource Style.Button.Secondary}"
+                ToolTip="匯出目前選取期間的所有記錄" />
+            <Button
+                HorizontalAlignment="Right"
+                Click="OnOpenFolderClick"
+                Content="開啟資料夾"
+                Style="{StaticResource Style.Button.Secondary}"
+                ToolTip="開啟存放資料庫與設定的資料夾" />
+        </Grid>
+    </Grid>
+</Window>

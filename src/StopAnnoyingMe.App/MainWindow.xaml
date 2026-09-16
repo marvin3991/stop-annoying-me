@@ -1,12 +1,231 @@
-﻿<Window x:Class="StopAnnoyingMe.App.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:StopAnnoyingMe.App"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+﻿<Window
+    x:Class="StopAnnoyingMe.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="打擾記錄器"
+    Width="340"
+    MinHeight="540"
+    MaxHeight="540"
+    Height="540"
+    Icon="Assets/app.ico"
+    ShowInTaskbar="True"
+    Style="{StaticResource Style.Window.Main}"
+    WindowStartupLocation="Manual">
+    <!--  主題預設 460 高，放不下 5 筆記錄；此處加高到剛好容納一整頁清單  -->
 
+    <Grid>
+        <Grid Margin="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="44" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!--  標題列：整條可拖曳，按鈕已在樣式中設定 IsHitTestVisibleInChrome  -->
+            <Grid Grid.Row="0" Margin="16,0,6,0">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Style="{StaticResource Style.Text.Body}"
+                    Text="打擾記錄器" />
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button
+                        x:Name="PinButton"
+                        Click="OnTogglePinClick"
+                        Style="{StaticResource Style.Button.Icon}"
+                        ToolTip="視窗置頂">
+                        <Path
+                            Data="{StaticResource Geometry.Pin}"
+                            Stretch="None"
+                            Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                            StrokeEndLineCap="Round"
+                            StrokeLineJoin="Round"
+                            StrokeStartLineCap="Round"
+                            StrokeThickness="1.6" />
+                    </Button>
+                    <Button
+                        Click="OnStatsClick"
+                        Style="{StaticResource Style.Button.Icon}"
+                        ToolTip="統計">
+                        <Path
+                            Data="{StaticResource Geometry.Stats}"
+                            Stretch="None"
+                            Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                            StrokeEndLineCap="Round"
+                            StrokeStartLineCap="Round"
+                            StrokeThickness="1.8" />
+                    </Button>
+                    <Button
+                        Click="OnSettingsClick"
+                        Style="{StaticResource Style.Button.Icon}"
+                        ToolTip="設定">
+                        <Path
+                            Data="{StaticResource Geometry.Settings}"
+                            Stretch="None"
+                            Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                            StrokeEndLineCap="Round"
+                            StrokeStartLineCap="Round"
+                            StrokeThickness="1.6" />
+                    </Button>
+                    <Button
+                        x:Name="CloseButton"
+                        Click="OnCloseClick"
+                        Style="{StaticResource Style.Button.Icon}"
+                        ToolTip="收到系統匣">
+                        <Path
+                            Data="{StaticResource Geometry.Close}"
+                            Stretch="None"
+                            Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                            StrokeEndLineCap="Round"
+                            StrokeStartLineCap="Round"
+                            StrokeThickness="1.6" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!--  今日次數  -->
+            <StackPanel
+                Grid.Row="1"
+                Margin="0,10,0,4"
+                HorizontalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource Style.Text.Display}" Text="{Binding TodayCountText}" />
+                    <TextBlock
+                        Margin="6,0,0,10"
+                        VerticalAlignment="Bottom"
+                        Style="{StaticResource Style.Text.Caption}"
+                        Text="次" />
+                </StackPanel>
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource Style.Text.Muted}"
+                    Text="今日被打擾" />
+            </StackPanel>
+
+            <!--  主操作：畫面焦點，大面積不用瞄準  -->
+            <Button
+                Grid.Row="2"
+                Margin="16,10,16,0"
+                Click="OnRecordClick"
+                Content="＋1 被打擾"
+                Style="{StaticResource Style.Button.Primary}"
+                ToolTip="記下現在這一刻" />
+
+            <!--  可選標籤：不點也不影響記錄  -->
+            <ItemsControl
+                Grid.Row="3"
+                Margin="16,12,10,2"
+                ItemsSource="{Binding Chips}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button
+                            Margin="0,0,6,6"
+                            Click="OnChipClick"
+                            Content="{Binding Name}"
+                            Style="{StaticResource Style.Button.Chip}"
+                            Tag="{Binding TagValue}"
+                            ToolTip="標記最後一筆的來源" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!--  最近記錄  -->
+            <Border
+                Grid.Row="4"
+                Margin="12,4,12,0"
+                Padding="12,10"
+                Style="{StaticResource Style.Card}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock
+                        Grid.Row="0"
+                        Margin="2,0,0,6"
+                        Style="{StaticResource Style.Text.Muted}"
+                        Text="最近記錄" />
+
+                    <ListBox
+                        Grid.Row="1"
+                        ItemContainerStyle="{StaticResource Style.ListBoxItem.Record.Compact}"
+                        ItemsSource="{Binding Recent}"
+                        Style="{StaticResource Style.ListBox.Records}">
+                        <ListBox.Resources>
+                            <!--  真的溢出時用主題的細捲軸，不要 Windows 預設的粗捲軸  -->
+                            <Style BasedOn="{StaticResource Style.ScrollBar.Thin}" TargetType="{x:Type ScrollBar}" />
+                        </ListBox.Resources>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Style="{StaticResource Style.Text.Caption}"
+                                        Text="{Binding TimeText}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Style="{StaticResource Style.Text.Muted}"
+                                        Text="{Binding SourceText}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <TextBlock
+                        x:Name="EmptyHint"
+                        Grid.Row="1"
+                        Margin="2,8,0,0"
+                        VerticalAlignment="Top"
+                        Style="{StaticResource Style.Text.Muted}"
+                        Text="今天還沒有被打擾，很好。" />
+                </Grid>
+            </Border>
+
+            <!--  狀態列  -->
+            <Grid Grid.Row="5" Margin="12,10,16,12">
+                <Button
+                    x:Name="UndoButton"
+                    HorizontalAlignment="Left"
+                    Click="OnUndoClick"
+                    Content="撤銷最後一筆"
+                    IsEnabled="{Binding CanUndo}"
+                    Style="{StaticResource Style.Button.Secondary}"
+                    ToolTip="刪掉今天最後記下的那一筆" />
+                <TextBlock
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource Style.Text.Muted}"
+                    Text="{Binding HotkeyHint}" />
+            </Grid>
+        </Grid>
+
+        <!--  訊息條：疊在最上層，不影響版面高度  -->
+        <Border
+            x:Name="Snackbar"
+            Margin="12,0,12,12"
+            Padding="14,10"
+            VerticalAlignment="Bottom"
+            Background="{StaticResource Brush.Surface.Hover}"
+            BorderBrush="{StaticResource Brush.Accent}"
+            BorderThickness="1"
+            CornerRadius="{StaticResource Radius.Button}"
+            Visibility="Collapsed">
+            <TextBlock
+                x:Name="SnackbarText"
+                Style="{StaticResource Style.Text.Caption}"
+                TextWrapping="Wrap" />
+        </Border>
     </Grid>
 </Window>
