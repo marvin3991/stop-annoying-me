@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/StopAnnoyingMe.App/StopAnnoyingMe.App.csproj" />
+    <Project Path="src/StopAnnoyingMe.Core/StopAnnoyingMe.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/StopAnnoyingMe.Core.Tests/StopAnnoyingMe.Core.Tests.csproj" />
+  </Folder>
+</Solution>
