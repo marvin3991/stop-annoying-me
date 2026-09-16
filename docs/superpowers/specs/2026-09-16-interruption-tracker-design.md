@@ -61,6 +61,7 @@ StopAnnoyingMe.sln
 | `MainWindow` | 主畫面：記錄按鈕、今日次數、最近記錄、可選標籤 |
 | `StatsWindow` | 統計畫面：期間次數與每小時分佈長條圖 |
 | `SettingsWindow` | 設定：熱鍵、置頂、開機自啟、標籤清單、資料夾 |
+| `ToastWindow` | 熱鍵記錄後右下角的短暫提示（見 §5 F7） |
 | `GlobalHotkey` | 註冊／解除全域熱鍵，失敗時回報 |
 | `TrayIconController` | 系統匣圖示（顯示今日次數）、右鍵選單 |
 | `StartupManager` | 開機自動啟動（HKCU Run） |
@@ -114,11 +115,11 @@ CREATE TABLE schema_version (version INTEGER NOT NULL);
 | F4 | 可選標籤 | 記錄後主畫面出現標籤列，點一下即補標籤到最後一筆；不點不影響 |
 | F5 | 撤銷 | Undo 刪除最後一筆（僅限今日最後一筆） |
 | F6 | 去重保護 | 距上一筆未滿 `duplicateGuardSeconds` 秒 → 不記錄，顯示「剛剛已記錄」提示 |
-| F7 | 全域熱鍵 | 背景可用，記錄後跳系統匣氣泡提示今日次數 |
+| F7 | 全域熱鍵 | 背景可用，記錄後於右下角顯示 2.5 秒提示告知今日次數 |
 | F8 | 系統匣 | 圖示上顯示今日次數；右鍵選單：+1／開啟主畫面／統計／設定／結束 |
 | F9 | 置頂切換 | 主畫面可切換 always-on-top，設定持久化 |
 | F10 | 統計 | 今日／本週（週一起算）／本月次數；24 小時分佈長條圖 |
-| F11 | CSV 匯出 | 選擇期間匯出 `occurred_at, source, note`，UTF-8 with BOM（Excel 相容） |
+| F11 | CSV 匯出 | 選擇期間匯出「發生日期, 發生時間, 星期, 來源, 備註」，UTF-8 with BOM（Excel 相容） |
 | F12 | 開機自啟 | 寫入 `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` |
 | F13 | 單一執行個體 | 重複啟動時喚回既有視窗並結束新行程 |
 
@@ -155,9 +156,19 @@ UI 以實際建置執行驗證：啟動、點擊記錄、熱鍵、系統匣、�
 
 ## 8. 視覺設計
 
-配色、字體層級、按鈕與圖示樣式由 `codex exec` 產出 XAML ResourceDictionary 與 `.ico`，再整合進 App 專案並實際執行驗證。
+配色、字體層級、按鈕與圖示樣式由 `codex exec` 產出，成果為
+`src/StopAnnoyingMe.App/Themes/Design.xaml` 與 [../../design-notes.md](../../design-notes.md)。
+對話框需要而主題未涵蓋的控制項（TextBox、CheckBox、對話框視窗樣式、統計長條）
+補在 `Themes/Controls.xaml`，色彩一律沿用 Design.xaml 的 token，不另外定義顏色。
 
-設計方向：深色為主、單一強調色、主按鈕為畫面焦點；視窗尺寸精簡（約 320×420），不佔螢幕。
+設計方向：深色為主、單一強調色（青綠 `#4FC3B6`）、主按鈕為畫面焦點；
+文字對比皆達 WCAG AA（最低組合 5.36:1）。
+
+視窗尺寸：主畫面 340×540。原始版面草圖為 340×460，但實作後確認
+460 高度放不下 5 筆記錄（會出現捲軸），故加高到 540。
+
+應用程式圖示由 `tools/generate-icon.ps1` 以設計文件中的幾何路徑渲染成
+8 種尺寸組成 `.ico`，圖示調整時重跑腳本即可，不需手動修圖。
 
 ## 9. 明確不做（YAGNI）
 
