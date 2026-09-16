@@ -14,7 +14,7 @@
     <Product>打擾記錄器</Product>
     <AssemblyTitle>打擾記錄器</AssemblyTitle>
     <Description>上班被打擾時一鍵記錄時間並統計次數</Description>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 

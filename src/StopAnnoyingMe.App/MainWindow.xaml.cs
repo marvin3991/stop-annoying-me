@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using StopAnnoyingMe.App.Interop;
@@ -174,10 +175,65 @@ public partial class MainWindow : Window
             }
 
             Refresh();
+            ShowMessage(source is null
+                ? "已取消最後一筆的來源標記。"
+                : $"最後一筆已標記為「{source}」。");
         }
         catch (Exception ex)
         {
             HandleDataError("標記來源失敗", ex);
+        }
+    }
+
+    /// <summary>點最近記錄的任何一列，開啟編輯畫面改來源與備註。</summary>
+    private void OnRecordClick(object sender, MouseButtonEventArgs e)
+    {
+        if (e.OriginalSource is not DependencyObject origin)
+        {
+            return;
+        }
+
+        if (ItemsControl.ContainerFromElement(RecordList, origin) is not ListBoxItem
+            {
+                DataContext: RecordItemViewModel record
+            })
+        {
+            return;
+        }
+
+        e.Handled = true;
+        OpenRecordEditor(record.Id);
+
+        // 這個清單的「選取」沒有任何意義，點完就清掉，
+        // 免得留下一條高亮讓人以為處於某種狀態。
+        RecordList.SelectedIndex = -1;
+    }
+
+    private void OpenRecordEditor(long id)
+    {
+        try
+        {
+            var item = _services.Interruptions.GetById(id);
+            if (item is null)
+            {
+                // 例如在另一個視窗撤銷掉了，重新整理讓畫面回到正確狀態。
+                ShowMessage("這筆記錄已經不存在了。");
+                Refresh();
+                return;
+            }
+
+            var dialog = new RecordEditorWindow(_services, item) { Owner = this };
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            Refresh();
+            ShowMessage($"已更新 {item.OccurredAt:HH:mm:ss} 這筆記錄。");
+        }
+        catch (Exception ex)
+        {
+            HandleDataError("開啟編輯畫面失敗", ex);
         }
     }
 

@@ -308,11 +308,28 @@
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{StaticResource Radius.Chip}"
                         SnapsToDevicePixels="True">
-                        <ContentPresenter
-                            Margin="{TemplateBinding Padding}"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                            RecognizesAccessKey="True" />
+                        <Grid>
+                            <!--
+                                鍵盤焦點用虛線內框表示，不動外框顏色。
+                                外框若改成實心亮色會和「已選取」的實心填色混淆，
+                                使用者會以為點不掉。
+                            -->
+                            <Rectangle
+                                x:Name="FocusRing"
+                                Margin="2"
+                                IsHitTestVisible="False"
+                                RadiusX="999"
+                                RadiusY="999"
+                                Stroke="{StaticResource Brush.Text.Primary}"
+                                StrokeDashArray="2 2"
+                                StrokeThickness="1"
+                                Visibility="Collapsed" />
+                            <ContentPresenter
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                RecognizesAccessKey="True" />
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -344,9 +361,16 @@
                             <Setter TargetName="ChipChrome" Property="BorderBrush" Value="{StaticResource Brush.Accent.Pressed}" />
                         </MultiTrigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="ChipChrome" Property="BorderBrush" Value="{StaticResource Brush.Text.Primary}" />
-                            <Setter TargetName="ChipChrome" Property="BorderThickness" Value="{StaticResource Thickness.Border.Focus}" />
+                            <Setter TargetName="FocusRing" Property="Visibility" Value="Visible" />
                         </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="Tag" Value="Selected" />
+                                <Condition Property="IsKeyboardFocused" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <!-- 選取後底色是強調色，焦點虛線改用深色才看得清楚 -->
+                            <Setter TargetName="FocusRing" Property="Stroke" Value="{StaticResource Brush.Accent.Foreground}" />
+                        </MultiTrigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource Brush.Text.Muted}" />
                             <Setter Property="Opacity" Value="{StaticResource Opacity.Disabled}" />

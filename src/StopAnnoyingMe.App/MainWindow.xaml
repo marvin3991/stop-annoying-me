@@ -155,9 +155,11 @@
                         Text="最近記錄" />
 
                     <ListBox
+                        x:Name="RecordList"
                         Grid.Row="1"
                         ItemContainerStyle="{StaticResource Style.ListBoxItem.Record.Compact}"
                         ItemsSource="{Binding Recent}"
+                        PreviewMouseLeftButtonUp="OnRecordClick"
                         Style="{StaticResource Style.ListBox.Records}">
                         <ListBox.Resources>
                             <!--  真的溢出時用主題的細捲軸，不要 Windows 預設的粗捲軸  -->
@@ -165,8 +167,9 @@
                         </ListBox.Resources>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid>
+                                <Grid ToolTip="{Binding Tooltip}">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
@@ -176,6 +179,12 @@
                                         Text="{Binding TimeText}" />
                                     <TextBlock
                                         Grid.Column="1"
+                                        Margin="10,0,8,0"
+                                        Style="{StaticResource Style.Text.Muted}"
+                                        Text="{Binding NoteText}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <TextBlock
+                                        Grid.Column="2"
                                         Style="{StaticResource Style.Text.Muted}"
                                         Text="{Binding SourceText}" />
                                 </Grid>

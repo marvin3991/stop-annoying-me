@@ -5,7 +5,7 @@ using StopAnnoyingMe.Core.Models;
 
 namespace StopAnnoyingMe.App.ViewModels;
 
-/// <summary>清單中的一筆記錄。</summary>
+/// <summary>清單中的一筆記錄。點一下可以開啟編輯畫面改來源與備註。</summary>
 internal sealed class RecordItemViewModel(Interruption item)
 {
     public long Id { get; } = item.Id;
@@ -13,6 +13,22 @@ internal sealed class RecordItemViewModel(Interruption item)
     public string TimeText { get; } = item.OccurredAt.ToString("HH:mm:ss");
 
     public string SourceText { get; } = item.Source ?? "—";
+
+    /// <summary>備註內容，沒有備註時為空字串（清單上就不會顯示任何東西）。</summary>
+    public string NoteText { get; } = item.Note ?? string.Empty;
+
+    public string Tooltip { get; } = string.IsNullOrWhiteSpace(item.Note)
+        ? "點一下可以編輯來源與備註"
+        : $"備註：{item.Note}\n點一下可以編輯";
+
+    /// <summary>
+    /// 螢幕報讀軟體會讀 ListBoxItem 的名稱，預設會變成類別名稱，
+    /// 這裡給它一個有意義的字串。
+    /// </summary>
+    public override string ToString() =>
+        string.IsNullOrWhiteSpace(NoteText)
+            ? $"{TimeText}　來源 {SourceText}"
+            : $"{TimeText}　來源 {SourceText}　備註 {NoteText}";
 }
 
 /// <summary>標籤列上的一顆 chip。選取狀態透過 Tag 傳給主題樣式。</summary>

@@ -123,12 +123,13 @@
         </Setter>
     </Style>
 
-    <!--  主畫面的記錄列：比主題預設再緊一點，卡片才塞得下 5 筆  -->
+    <!--  主畫面的記錄列：比主題預設再緊一點，卡片才塞得下 5 筆；整列可點擊以開啟編輯  -->
     <Style
         x:Key="Style.ListBoxItem.Record.Compact"
         TargetType="{x:Type ListBoxItem}"
         BasedOn="{StaticResource Style.ListBoxItem.Record}">
         <Setter Property="Padding" Value="10,5" />
+        <Setter Property="Cursor" Value="Hand" />
     </Style>
 
     <!--  統計圖的長條  -->
