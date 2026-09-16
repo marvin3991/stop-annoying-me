@@ -62,6 +62,7 @@ StopAnnoyingMe.sln
 | `StatsWindow` | 統計畫面：期間次數與每小時分佈長條圖 |
 | `SettingsWindow` | 設定：熱鍵、置頂、開機自啟、標籤清單、資料夾 |
 | `ToastWindow` | 熱鍵記錄後右下角的短暫提示（見 §5 F7） |
+| `RecordEditorWindow` | 編輯單一筆記錄的來源與備註（見 §5 F14） |
 | `GlobalHotkey` | 註冊／解除全域熱鍵，失敗時回報 |
 | `TrayIconController` | 系統匣圖示（顯示今日次數）、右鍵選單 |
 | `StartupManager` | 開機自動啟動（HKCU Run） |
@@ -112,7 +113,7 @@ CREATE TABLE schema_version (version INTEGER NOT NULL);
 | F1 | 記錄打擾 | 點主按鈕或按熱鍵 → 以當下本地時間新增一筆，今日次數 +1 |
 | F2 | 今日次數 | 主畫面大字顯示，跨午夜自動歸零 |
 | F3 | 最近記錄 | 顯示今日最近 5 筆時間（HH:mm:ss）與標籤 |
-| F4 | 可選標籤 | 記錄後主畫面出現標籤列，點一下即補標籤到最後一筆；不點不影響 |
+| F4 | 可選標籤 | 主畫面標籤列，點一下把標籤補到今天最後一筆；再點同一顆取消標記；不點不影響 |
 | F5 | 撤銷 | Undo 刪除最後一筆（僅限今日最後一筆） |
 | F6 | 去重保護 | 距上一筆未滿 `duplicateGuardSeconds` 秒 → 不記錄，顯示「剛剛已記錄」提示 |
 | F7 | 全域熱鍵 | 背景可用，記錄後於右下角顯示 2.5 秒提示告知今日次數 |
@@ -122,6 +123,7 @@ CREATE TABLE schema_version (version INTEGER NOT NULL);
 | F11 | CSV 匯出 | 選擇期間匯出「發生日期, 發生時間, 星期, 來源, 備註」，UTF-8 with BOM（Excel 相容） |
 | F12 | 開機自啟 | 寫入 `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` |
 | F13 | 單一執行個體 | 重複啟動時喚回既有視窗並結束新行程 |
+| F14 | 編輯記錄 | 點「最近記錄」的任一列開啟編輯視窗，可改來源與備註（最多 500 字）。發生時間唯讀 —— 那是本工具唯一的事實依據，能改就失去意義。備註內容直接顯示在清單列上 |
 
 ## 6. 邊界條件與例外處理
 

@@ -4,9 +4,9 @@
 
 常駐桌面、可置頂、可收到系統匣。設計目標只有一個：**從「被打擾」到「記錄完成」不超過一個動作，而且不必離開手上的工作。**
 
-| 主畫面 | 統計 | 設定 |
-|---|---|---|
-| ![主畫面](docs/screenshots/main.png) | ![統計](docs/screenshots/stats.png) | ![設定](docs/screenshots/settings.png) |
+| 主畫面 | 編輯記錄 | 統計 | 設定 |
+|---|---|---|---|
+| ![主畫面](docs/screenshots/main.png) | ![編輯記錄](docs/screenshots/editor.png) | ![統計](docs/screenshots/stats.png) | ![設定](docs/screenshots/settings.png) |
 
 ---
 
@@ -57,7 +57,8 @@ dotnet run --project src/StopAnnoyingMe.App
 | 想做的事 | 怎麼做 |
 |---|---|
 | 記一次打擾 | 點主畫面的「＋1 被打擾」，或按熱鍵 `Ctrl+Alt+D`（預設），或從系統匣圖示右鍵選「記一次打擾」 |
-| 標記是誰打擾 | 記錄之後點一下標籤（同事／主管／電話／會議／其他）。再點同一個標籤可取消 |
+| 標記是誰打擾 | 記錄之後點一下標籤（同事／主管／電話／會議／其他）。**再點同一個標籤就取消標記** |
+| 補備註／改來源 | **點一下「最近記錄」裡的任一列**，開啟編輯視窗改來源與備註。發生時間不可修改 |
 | 按錯了 | 點「撤銷最後一筆」 |
 | 看統計 | 標題列的長條圖圖示，可切換今日／本週／本月 |
 | 匯出資料 | 統計畫面 →「匯出 CSV」，會匯出目前選取期間的所有記錄 |
@@ -76,7 +77,8 @@ dotnet run --project src/StopAnnoyingMe.App
 | 記錄內容 | 發生時間（本地時間，精確到秒）、可選來源標籤、可選備註 | 不記錄打擾持續時間 |
 | 手滑保護 | 距上一筆未滿 N 秒的重複觸發不寫入，並顯示提示 | 預設 3 秒；可在設定改為 0–3600，0 表示關閉 |
 | 撤銷 | 只刪除「今天」的最後一筆 | 今天沒有記錄時按鈕停用；不會動到昨天的資料 |
-| 標籤 | 標記今天最後一筆的來源 | 最多 8 個標籤；不標記不影響記錄 |
+| 標籤 | 標記今天最後一筆的來源，再點一次取消 | 最多 8 個標籤；不標記不影響記錄 |
+| 編輯記錄 | 點清單中的任一列改來源與備註 | 備註最多 500 字；發生時間不可修改；按取消不會寫入 |
 | 今日次數 | 以本地日期計算，跨午夜自動歸零 | 每 30 秒檢查一次日期變更 |
 | 本週 | 週一為一週之始 | 台灣工作週慣例 |
 | 本月 | 當月 1 日至月底 | 自動處理閏年二月與跨年 |
@@ -123,7 +125,7 @@ dotnet run --project src/StopAnnoyingMe.App
 ```
 src/StopAnnoyingMe.Core        純邏輯（資料存取、統計、設定、熱鍵解析），無 UI 相依
 src/StopAnnoyingMe.App         WPF 介面、系統匣、全域熱鍵
-tests/StopAnnoyingMe.Core.Tests xUnit，98 個測試
+tests/StopAnnoyingMe.Core.Tests xUnit，110 個測試
 tools/generate-icon.ps1        由向量路徑產生多尺寸 app.ico
 tools/publish.ps1              跑測試 → 產圖示 → 輸出單一執行檔到 dist\
 docs/                          設計規格、視覺設計說明、截圖
@@ -153,3 +155,7 @@ docs/                          設計規格、視覺設計說明、截圖
 - 視覺主題在 `src/StopAnnoyingMe.App/Themes/Design.xaml`，色票與對比值記在 [docs/design-notes.md](docs/design-notes.md)
 - 設計決策與邊界條件清單在 [docs/superpowers/specs/2026-09-16-interruption-tracker-design.md](docs/superpowers/specs/2026-09-16-interruption-tracker-design.md)
 - CSV 匯出不對以 `=`、`+`、`-`、`@` 開頭的欄位做跳脫；資料來自使用者自己輸入的備註，優先保持內容原樣
+
+## 授權
+
+[MIT](LICENSE)
