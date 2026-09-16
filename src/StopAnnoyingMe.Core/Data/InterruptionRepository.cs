@@ -69,6 +69,31 @@ public sealed class InterruptionRepository
         return command.ExecuteNonQuery() > 0;
     }
 
+    /// <summary>
+    /// 一次更新指定記錄的標籤與備註。兩者傳入 null 或空白都代表清空。
+    /// 記錄不存在時回傳 false。
+    /// </summary>
+    public bool UpdateDetails(long id, string? source, string? note)
+    {
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        command.CommandText = "UPDATE interruptions SET source = $source, note = $note WHERE id = $id;";
+        command.Parameters.AddWithValue("$source", Normalize(source));
+        command.Parameters.AddWithValue("$note", Normalize(note));
+        command.Parameters.AddWithValue("$id", id);
+        return command.ExecuteNonQuery() > 0;
+    }
+
+    /// <summary>依主鍵取回一筆記錄。找不到時回傳 null。</summary>
+    public Interruption? GetById(long id)
+    {
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        command.CommandText = $"{SelectColumns} WHERE id = $id LIMIT 1;";
+        command.Parameters.AddWithValue("$id", id);
+        return ReadSingle(command);
+    }
+
     /// <summary>全庫最後一筆（依發生時間，同時間則取較晚寫入者）。沒有資料時回傳 null。</summary>
     public Interruption? GetLast()
     {

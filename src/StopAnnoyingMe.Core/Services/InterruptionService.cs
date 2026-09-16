@@ -84,6 +84,16 @@ public sealed class InterruptionService
         return last is not null && _repository.UpdateSource(last.Id, source);
     }
 
+    /// <summary>
+    /// 修改某一筆記錄的來源與備註。供「點記錄去編輯」使用。
+    /// 記錄不存在時回傳 false。
+    /// </summary>
+    public bool UpdateDetails(long id, string? source, string? note) =>
+        _repository.UpdateDetails(id, source, note);
+
+    /// <summary>依主鍵取回一筆記錄，供編輯畫面載入目前內容。</summary>
+    public Interruption? GetById(long id) => _repository.GetById(id);
+
     public int TodayCount() => _repository.CountByDate(DateOnly.FromDateTime(_clock()));
 
     /// <summary>今日最近幾筆，由新到舊。</summary>

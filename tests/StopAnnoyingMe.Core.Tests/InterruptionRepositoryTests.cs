@@ -190,6 +190,92 @@ public class InterruptionRepositoryTests
     }
 
     [Fact]
+    public void 依主鍵取回記錄找不到時回傳null()
+    {
+        using var workspace = new TempWorkspace();
+        var repository = CreateRepository(workspace);
+        var added = repository.Add(new DateTime(2026, 9, 16, 10, 0, 0), "同事", "問報價");
+
+        var found = repository.GetById(added.Id);
+
+        Assert.NotNull(found);
+        Assert.Equal(added.Id, found!.Id);
+        Assert.Equal("同事", found.Source);
+        Assert.Equal("問報價", found.Note);
+        Assert.Null(repository.GetById(9999));
+    }
+
+    [Fact]
+    public void 一次更新來源與備註()
+    {
+        using var workspace = new TempWorkspace();
+        var repository = CreateRepository(workspace);
+        var added = repository.Add(new DateTime(2026, 9, 16, 10, 0, 0));
+
+        Assert.True(repository.UpdateDetails(added.Id, "主管", "臨時插件"));
+
+        var updated = repository.GetById(added.Id)!;
+        Assert.Equal("主管", updated.Source);
+        Assert.Equal("臨時插件", updated.Note);
+        // 發生時間不能被編輯動到
+        Assert.Equal(new DateTime(2026, 9, 16, 10, 0, 0), updated.OccurredAt);
+    }
+
+    [Theory]
+    [InlineData(null, null)]
+    [InlineData("", "")]
+    [InlineData("   ", "   ")]
+    public void 更新時傳入空白代表清空來源與備註(string? source, string? note)
+    {
+        using var workspace = new TempWorkspace();
+        var repository = CreateRepository(workspace);
+        var added = repository.Add(new DateTime(2026, 9, 16, 10, 0, 0), "同事", "原本的備註");
+
+        Assert.True(repository.UpdateDetails(added.Id, source, note));
+
+        var updated = repository.GetById(added.Id)!;
+        Assert.Null(updated.Source);
+        Assert.Null(updated.Note);
+    }
+
+    [Fact]
+    public void 更新時前後空白會被去掉()
+    {
+        using var workspace = new TempWorkspace();
+        var repository = CreateRepository(workspace);
+        var added = repository.Add(new DateTime(2026, 9, 16, 10, 0, 0));
+
+        repository.UpdateDetails(added.Id, "  主管  ", "  臨時插件  ");
+
+        var updated = repository.GetById(added.Id)!;
+        Assert.Equal("主管", updated.Source);
+        Assert.Equal("臨時插件", updated.Note);
+    }
+
+    [Fact]
+    public void 更新不存在的記錄回傳false()
+    {
+        using var workspace = new TempWorkspace();
+        var repository = CreateRepository(workspace);
+
+        Assert.False(repository.UpdateDetails(9999, "主管", "備註"));
+    }
+
+    [Fact]
+    public void 更新某一筆不會影響其他筆()
+    {
+        using var workspace = new TempWorkspace();
+        var repository = CreateRepository(workspace);
+        var first = repository.Add(new DateTime(2026, 9, 16, 9, 0, 0), "同事", "A");
+        var second = repository.Add(new DateTime(2026, 9, 16, 10, 0, 0), "電話", "B");
+
+        repository.UpdateDetails(first.Id, "主管", "改過了");
+
+        Assert.Equal("電話", repository.GetById(second.Id)!.Source);
+        Assert.Equal("B", repository.GetById(second.Id)!.Note);
+    }
+
+    [Fact]
     public void 最早日期回傳全庫最小的日期()
     {
         using var workspace = new TempWorkspace();

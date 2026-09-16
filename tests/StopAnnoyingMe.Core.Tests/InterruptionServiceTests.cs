@@ -166,6 +166,70 @@ public class InterruptionServiceTests
     }
 
     [Fact]
+    public void 可以編輯指定記錄的來源與備註()
+    {
+        using var workspace = new TempWorkspace();
+        var (service, _, clock) = Create(workspace);
+
+        var first = service.Record(0).Item!;
+        clock.Advance(60);
+        service.Record(0);
+
+        // 編輯的是第一筆（不是最後一筆），驗證編輯確實依 id 而非「最後一筆」
+        Assert.True(service.UpdateDetails(first.Id, "主管", "臨時插件"));
+
+        var reloaded = service.GetById(first.Id)!;
+        Assert.Equal("主管", reloaded.Source);
+        Assert.Equal("臨時插件", reloaded.Note);
+
+        var recent = service.RecentToday(5);
+        Assert.Null(recent[0].Source);   // 最後一筆沒被動到
+    }
+
+    [Fact]
+    public void 編輯不存在的記錄回傳false()
+    {
+        using var workspace = new TempWorkspace();
+        var (service, _, _) = Create(workspace);
+
+        Assert.False(service.UpdateDetails(9999, "主管", "備註"));
+        Assert.Null(service.GetById(9999));
+    }
+
+    [Fact]
+    public void 標籤可以反覆切換開關()
+    {
+        using var workspace = new TempWorkspace();
+        var (service, _, _) = Create(workspace);
+        service.Record(0);
+
+        // 這是主畫面標籤列的行為：點一次標上、再點一次清掉、再點又標上
+        Assert.True(service.TagLastToday("主管"));
+        Assert.Equal("主管", service.RecentToday(1)[0].Source);
+
+        Assert.True(service.TagLastToday(null));
+        Assert.Null(service.RecentToday(1)[0].Source);
+
+        Assert.True(service.TagLastToday("主管"));
+        Assert.Equal("主管", service.RecentToday(1)[0].Source);
+
+        Assert.True(service.TagLastToday("電話"));
+        Assert.Equal("電話", service.RecentToday(1)[0].Source);
+    }
+
+    [Fact]
+    public void 編輯記錄不會改動發生時間()
+    {
+        using var workspace = new TempWorkspace();
+        var (service, _, _) = Create(workspace);
+        var item = service.Record(0).Item!;
+
+        service.UpdateDetails(item.Id, "會議", "週會被叫走");
+
+        Assert.Equal(item.OccurredAt, service.GetById(item.Id)!.OccurredAt);
+    }
+
+    [Fact]
     public void 最近記錄由新到舊且只取今天的()
     {
         using var workspace = new TempWorkspace();
