@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="編輯記錄"
     Width="380"
-    Height="400"
+    Height="430"
     Icon="../Assets/app.ico"
     ShowInTaskbar="False"
     Style="{StaticResource Style.Window.Dialog}"
@@ -118,26 +118,58 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Row="4" Margin="16,12,16,16">
+        <StackPanel Grid.Row="4" Margin="16,10,16,16">
             <TextBlock
                 x:Name="ErrorText"
-                VerticalAlignment="Center"
+                Margin="0,0,0,8"
                 Foreground="{StaticResource Brush.Danger}"
                 Style="{StaticResource Style.Text.Caption}"
                 TextWrapping="Wrap"
                 Visibility="Collapsed" />
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+
+            <!--  一般狀態  -->
+            <Grid x:Name="NormalActions">
                 <Button
-                    Margin="0,0,8,0"
-                    Click="OnCancelClick"
-                    Content="取消"
-                    IsCancel="True"
-                    Style="{StaticResource Style.Button.Secondary}" />
-                <Button
-                    Click="OnSaveClick"
-                    Content="儲存"
-                    Style="{StaticResource Style.Button.Secondary}" />
-            </StackPanel>
-        </Grid>
+                    HorizontalAlignment="Left"
+                    Click="OnDeleteClick"
+                    Content="刪除這筆"
+                    Style="{StaticResource Style.Button.Danger.Subtle}"
+                    ToolTip="把這筆記錄從資料庫刪掉" />
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button
+                        Margin="0,0,8,0"
+                        Click="OnCancelClick"
+                        Content="取消"
+                        IsCancel="True"
+                        Style="{StaticResource Style.Button.Secondary}" />
+                    <Button
+                        Click="OnSaveClick"
+                        Content="儲存"
+                        Style="{StaticResource Style.Button.Secondary}" />
+                </StackPanel>
+            </Grid>
+
+            <!--  刪除確認：刪除無法復原，一定要再問一次  -->
+            <Grid x:Name="DeleteConfirm" Visibility="Collapsed">
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Foreground="{StaticResource Brush.Danger}"
+                    Style="{StaticResource Style.Text.Caption}"
+                    Text="刪除後無法復原" />
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button
+                        Margin="0,0,8,0"
+                        Click="OnDeleteCancelClick"
+                        Content="不要"
+                        Style="{StaticResource Style.Button.Secondary}" />
+                    <Button
+                        x:Name="DeleteConfirmButton"
+                        Click="OnDeleteConfirmClick"
+                        Content="確定刪除"
+                        Style="{StaticResource Style.Button.Danger}" />
+                </StackPanel>
+            </Grid>
+        </StackPanel>
     </Grid>
 </Window>

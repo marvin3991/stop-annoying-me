@@ -229,7 +229,9 @@ public partial class MainWindow : Window
             }
 
             Refresh();
-            ShowMessage($"已更新 {item.OccurredAt:HH:mm:ss} 這筆記錄。");
+            ShowMessage(dialog.Deleted
+                ? $"已刪除 {item.OccurredAt:HH:mm:ss} 這筆記錄。"
+                : $"已更新 {item.OccurredAt:HH:mm:ss} 這筆記錄。");
         }
         catch (Exception ex)
         {

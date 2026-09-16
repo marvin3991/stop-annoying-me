@@ -132,6 +132,113 @@
         <Setter Property="Cursor" Value="Hand" />
     </Style>
 
+    <!--
+        破壞性動作用的按鈕。Design.xaml 的 Secondary 樣式在 hover 時會把前景色蓋成
+        Text.Primary，衍生樣式改不掉，所以這裡重寫整個 Template。
+        Danger 的深淺兩階是從 Brush.Danger (#FF7B79) 手調出來的。
+    -->
+    <SolidColorBrush x:Key="Brush.Danger.Hover" Color="#FF9694" />
+    <SolidColorBrush x:Key="Brush.Danger.Pressed" Color="#E56260" />
+
+    <!--  第一步：只是「想刪」，用文字色提示，不做成顯眼的紅色實心塊  -->
+    <Style x:Key="Style.Button.Danger.Subtle" TargetType="{x:Type Button}">
+        <Setter Property="MinHeight" Value="{StaticResource Size.Button.Secondary.MinHeight}" />
+        <Setter Property="Padding" Value="{StaticResource Padding.Button.Secondary}" />
+        <Setter Property="Background" Value="{StaticResource Brush.Transparent}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}" />
+        <Setter Property="BorderThickness" Value="{StaticResource Thickness.Border.Standard}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Danger}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamily.Default}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border
+                        x:Name="Chrome"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{StaticResource Radius.Button}"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Brush.Danger}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush.Danger.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{StaticResource Brush.Window.Background}" />
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Brush.Danger.Pressed}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Brush.Danger}" />
+                            <Setter TargetName="Chrome" Property="BorderThickness" Value="{StaticResource Thickness.Border.Focus}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Muted}" />
+                            <Setter Property="Opacity" Value="{StaticResource Opacity.Disabled}" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  第二步：真的要刪，做成實心紅底，讓使用者知道按下去就回不去了  -->
+    <Style x:Key="Style.Button.Danger" TargetType="{x:Type Button}" BasedOn="{StaticResource Style.Button.Danger.Subtle}">
+        <Setter Property="Background" Value="{StaticResource Brush.Danger}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Danger}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Accent.Foreground}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border
+                        x:Name="Chrome"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{StaticResource Radius.Button}"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{StaticResource Brush.Danger.Hover}" />
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Brush.Danger.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{StaticResource Brush.Danger.Pressed}" />
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Brush.Danger.Pressed}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Brush.Text.Primary}" />
+                            <Setter TargetName="Chrome" Property="BorderThickness" Value="{StaticResource Thickness.Border.Focus}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="{StaticResource Opacity.Disabled}" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--  統計圖的長條  -->
     <Style x:Key="Style.Bar" TargetType="{x:Type Rectangle}">
         <Setter Property="Fill" Value="{StaticResource Brush.Accent}" />

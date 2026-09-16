@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using StopAnnoyingMe.App.Services;
 using StopAnnoyingMe.App.ViewModels;
 using StopAnnoyingMe.Core.Models;
@@ -20,6 +21,12 @@ public partial class RecordEditorWindow : Window
     private readonly ObservableCollection<SourceChipViewModel> _chips = [];
 
     private string? _selectedSource;
+
+    /// <summary>
+    /// 對話框是以「刪除」而不是「儲存」結束的。
+    /// 呼叫端用這個決定要顯示哪一種提示訊息。
+    /// </summary>
+    public bool Deleted { get; private set; }
 
     internal RecordEditorWindow(AppServices services, Interruption item)
     {
@@ -101,6 +108,60 @@ public partial class RecordEditorWindow : Window
     {
         DialogResult = false;
         Close();
+    }
+
+    /// <summary>第一步：切到確認狀態。這一步不會動到任何資料。</summary>
+    private void OnDeleteClick(object sender, RoutedEventArgs e)
+    {
+        ClearError();
+        NormalActions.Visibility = Visibility.Collapsed;
+        DeleteConfirm.Visibility = Visibility.Visible;
+
+        // 焦點移到確認鈕，鍵盤使用者不用再 Tab 一次
+        DeleteConfirmButton.Focus();
+    }
+
+    private void OnDeleteCancelClick(object sender, RoutedEventArgs e) => ReturnToNormalActions();
+
+    /// <summary>第二步：真的刪除。這個動作無法復原。</summary>
+    private void OnDeleteConfirmClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            // 回傳 false 代表這筆已經不在了（例如在主畫面按過撤銷），
+            // 結果與使用者要的一致，照樣當成刪除完成讓主畫面重新整理。
+            _services.Interruptions.Delete(_item.Id);
+        }
+        catch (Exception ex)
+        {
+            ErrorLog.Write("刪除記錄失敗", ex);
+            ReturnToNormalActions();
+            ShowError($"刪除失敗：{ex.Message}");
+            return;
+        }
+
+        Deleted = true;
+        DialogResult = true;
+        Close();
+    }
+
+    private void ReturnToNormalActions()
+    {
+        DeleteConfirm.Visibility = Visibility.Collapsed;
+        NormalActions.Visibility = Visibility.Visible;
+    }
+
+    /// <summary>在確認刪除的狀態下按 Esc，先退回一般狀態而不是直接關掉視窗。</summary>
+    protected override void OnPreviewKeyDown(KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape && DeleteConfirm.Visibility == Visibility.Visible)
+        {
+            e.Handled = true;
+            ReturnToNormalActions();
+            return;
+        }
+
+        base.OnPreviewKeyDown(e);
     }
 
     private void ShowError(string message)
