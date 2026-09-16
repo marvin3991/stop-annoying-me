@@ -94,6 +94,12 @@ public sealed class InterruptionService
     /// <summary>依主鍵取回一筆記錄，供編輯畫面載入目前內容。</summary>
     public Interruption? GetById(long id) => _repository.GetById(id);
 
+    /// <summary>
+    /// 刪除指定的一筆記錄，不限於今天、也不限於最後一筆。
+    /// 記錄不存在時回傳 false。呼叫端務必先向使用者確認 —— 這個動作無法復原。
+    /// </summary>
+    public bool Delete(long id) => _repository.DeleteById(id);
+
     public int TodayCount() => _repository.CountByDate(DateOnly.FromDateTime(_clock()));
 
     /// <summary>今日最近幾筆，由新到舊。</summary>

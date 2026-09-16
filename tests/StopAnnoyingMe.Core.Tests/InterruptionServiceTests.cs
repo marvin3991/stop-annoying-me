@@ -218,6 +218,75 @@ public class InterruptionServiceTests
     }
 
     [Fact]
+    public void 可以刪除中間某一筆而不影響其他筆()
+    {
+        using var workspace = new TempWorkspace();
+        var (service, repository, clock) = Create(workspace);
+
+        var first = service.Record(0).Item!;
+        clock.Advance(60);
+        var middle = service.Record(0).Item!;
+        clock.Advance(60);
+        var last = service.Record(0).Item!;
+
+        Assert.True(service.Delete(middle.Id));
+
+        Assert.Equal(2, repository.TotalCount());
+        Assert.Null(service.GetById(middle.Id));
+        Assert.NotNull(service.GetById(first.Id));
+        Assert.NotNull(service.GetById(last.Id));
+        Assert.Equal(2, service.TodayCount());
+    }
+
+    [Fact]
+    public void 重複刪除同一筆第二次回傳false()
+    {
+        using var workspace = new TempWorkspace();
+        var (service, _, _) = Create(workspace);
+        var item = service.Record(0).Item!;
+
+        Assert.True(service.Delete(item.Id));
+        Assert.False(service.Delete(item.Id));
+    }
+
+    [Fact]
+    public void 刪除不存在的記錄回傳false()
+    {
+        using var workspace = new TempWorkspace();
+        var (service, _, _) = Create(workspace);
+
+        Assert.False(service.Delete(9999));
+    }
+
+    [Fact]
+    public void 刪除昨天的記錄不影響今日次數()
+    {
+        using var workspace = new TempWorkspace();
+        var (service, repository, _) = Create(workspace);
+        var yesterday = repository.Add(new DateTime(2026, 9, 15, 10, 0, 0));
+        service.Record(0);
+
+        Assert.True(service.Delete(yesterday.Id));
+
+        Assert.Equal(1, service.TodayCount());
+        Assert.Equal(1, repository.TotalCount());
+    }
+
+    [Fact]
+    public void 刪掉今天全部記錄後次數歸零且不能再撤銷()
+    {
+        using var workspace = new TempWorkspace();
+        var (service, _, _) = Create(workspace);
+        var only = service.Record(0).Item!;
+
+        Assert.True(service.Delete(only.Id));
+
+        Assert.Equal(0, service.TodayCount());
+        Assert.Empty(service.RecentToday(5));
+        Assert.False(service.UndoLastToday().Undone);
+    }
+
+    [Fact]
     public void 編輯記錄不會改動發生時間()
     {
         using var workspace = new TempWorkspace();
