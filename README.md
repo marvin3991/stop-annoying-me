@@ -10,14 +10,21 @@
 
 ---
 
-## 安裝與執行
+## 下載與執行
 
-### 直接使用
+到 [Releases](https://github.com/marvin3991/stop-annoying-me/releases/latest) 下載，兩種版本擇一：
 
-1. 確認電腦已安裝 **.NET 10 Desktop Runtime**（[下載頁](https://dotnet.microsoft.com/download/dotnet/10.0)）。
-2. 取得 `dist\StopAnnoyingMe.exe`（見下方「自行建置」），放到任何資料夾，直接執行。
+| 檔案 | 大小 | 需要什麼 |
+|---|---|---|
+| `StopAnnoyingMe.exe` | 約 2.5 MB | 電腦需已安裝 [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) |
+| `StopAnnoyingMe-selfcontained.exe` | 約 150 MB | 不需要，Runtime 已包在裡面 |
 
-單一執行檔、免安裝、不需要系統管理員權限。
+兩者功能完全相同。下載後放到任何資料夾直接執行即可 —— 單一執行檔、免安裝、不寫 Program Files、不需要系統管理員權限。
+
+> Windows SmartScreen 可能會因為執行檔沒有程式碼簽章而跳出警告。這支程式沒有付費簽章憑證；
+> 介意的話請照下方「自行建置」自己編譯。
+
+環境需求：Windows 10 1809 以上（x64）。
 
 ### 自行建置
 
