@@ -160,10 +160,12 @@
                     Margin="0,0,8,0"
                     Click="OnCancelClick"
                     Content="取消"
+                    IsCancel="True"
                     Style="{StaticResource Style.Button.Secondary}" />
                 <Button
                     Click="OnSaveClick"
                     Content="儲存"
+                    IsDefault="True"
                     Style="{StaticResource Style.Button.Secondary}" />
             </StackPanel>
         </Grid>
