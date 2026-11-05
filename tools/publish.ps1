@@ -6,18 +6,15 @@
 .DESCRIPTION
     會先跑完整單元測試，測試沒過就不產生輸出，避免把壞掉的版本交出去。
     產出為相依框架（framework-dependent）的單一執行檔，需要目標電腦已安裝
-    .NET 10 Desktop Runtime；加上 -SelfContained 則不需要，但檔案約 150 MB。
+    .NET Desktop Runtime 10。LICENSE 與 THIRD-PARTY-NOTICES.md 會一起放到輸出資料夾，
+    發 release 時要和 exe 一起上傳。
 
 .EXAMPLE
     pwsh -File tools/publish.ps1
-
-.EXAMPLE
-    pwsh -File tools/publish.ps1 -SelfContained
 #>
 
 [CmdletBinding()]
 param(
-    [switch]$SelfContained,
     [switch]$SkipTests,
     [string]$OutputDirectory = (Join-Path $PSScriptRoot '..\dist')
 )
@@ -55,7 +52,7 @@ try {
         '-r', 'win-x64',
         '-o', $outputFull,
         '--nologo',
-        "-p:SelfContained=$($SelfContained.IsPresent.ToString().ToLowerInvariant())",
+        '-p:SelfContained=false',
         '-p:PublishSingleFile=true',
         # SQLite 的 e_sqlite3.dll 是原生程式庫，不夾帶進來單一執行檔會缺檔
         '-p:IncludeNativeLibrariesForSelfExtract=true',
@@ -71,12 +68,14 @@ try {
         throw "找不到預期的輸出檔：$executable"
     }
 
+    foreach ($notice in 'LICENSE', 'THIRD-PARTY-NOTICES.md') {
+        Copy-Item -LiteralPath $notice -Destination $outputFull
+    }
+
     $sizeMb = [math]::Round((Get-Item -LiteralPath $executable).Length / 1MB, 1)
     Write-Host ''
     Write-Host "✓ 完成：$executable（$sizeMb MB）" -ForegroundColor Green
-    if (-not $SelfContained) {
-        Write-Host '  需要目標電腦已安裝 .NET 10 Desktop Runtime。'
-    }
+    Write-Host '  需要目標電腦已安裝 .NET Desktop Runtime 10。'
     Get-ChildItem -LiteralPath $outputFull | Select-Object Name, @{ N = 'Size'; E = { $_.Length } }
 }
 finally {

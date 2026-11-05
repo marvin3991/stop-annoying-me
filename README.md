@@ -12,14 +12,21 @@
 
 ## 下載與執行
 
-到 [Releases](https://github.com/marvin3991/stop-annoying-me/releases/latest) 下載，兩種版本擇一：
+1. 安裝 [.NET Desktop Runtime 10](https://dotnet.microsoft.com/download/dotnet/10.0)（Windows x64）。已經裝過就不用再裝；安裝時 Windows 可能會要求系統管理員權限。
+2. 到 [Releases](https://github.com/marvin3991/stop-annoying-me/releases/latest) 下載 `StopAnnoyingMe.exe`（約 2.5 MB）。
+3. 放到任何資料夾直接執行。程式本身是單一執行檔、免安裝、不寫 Program Files、不需要系統管理員權限。
 
-| 檔案 | 大小 | 需要什麼 |
-|---|---|---|
-| `StopAnnoyingMe.exe` | 約 2.5 MB | 電腦需已安裝 [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) |
-| `StopAnnoyingMe-selfcontained.exe` | 約 150 MB | 不需要，Runtime 已包在裡面 |
+Runtime 要裝對版本，程式才會啟動：
 
-兩者功能完全相同。下載後放到任何資料夾直接執行即可 —— 單一執行檔、免安裝、不寫 Program Files、不需要系統管理員權限。
+| 電腦上有什麼 | 能不能執行 |
+|---|---|
+| .NET Desktop Runtime 10 | 可以 |
+| 只有 .NET Runtime 10（少了 Desktop） | 不行 |
+| 只有 9 以前或 11 以後的版本 | 不行 |
+
+不行的時候，Windows 會跳出 .NET 的英文提示（You must install or update .NET to run this application），裡面有 Download it now。
+
+v1.0.0～v1.2.0 原本另外提供內含 Runtime 的 `StopAnnoyingMe-selfcontained.exe`，已經撤下。
 
 > Windows SmartScreen 可能會因為執行檔沒有程式碼簽章而跳出警告。這支程式沒有付費簽章憑證；
 > 介意的話請照下方「自行建置」自己編譯。
@@ -34,13 +41,7 @@
 pwsh -File tools/publish.ps1
 ```
 
-腳本會先跑完整單元測試，測試沒過就不產生輸出；接著重新產生圖示，最後把單一執行檔輸出到 `dist\`。
-
-不需要對方安裝 Runtime 時：
-
-```powershell
-pwsh -File tools/publish.ps1 -SelfContained
-```
+腳本會先跑完整單元測試，測試沒過就不產生輸出；接著重新產生圖示，最後把單一執行檔連同 `LICENSE`、`THIRD-PARTY-NOTICES.md` 輸出到 `dist\`。
 
 開發時的一般指令：
 
@@ -129,7 +130,7 @@ src/StopAnnoyingMe.Core        純邏輯（資料存取、統計、設定、熱�
 src/StopAnnoyingMe.App         WPF 介面、系統匣、全域熱鍵
 tests/StopAnnoyingMe.Core.Tests xUnit，115 個測試
 tools/generate-icon.ps1        由向量路徑產生多尺寸 app.ico
-tools/publish.ps1              跑測試 → 產圖示 → 輸出單一執行檔到 dist\
+tools/publish.ps1              跑測試 → 產圖示 → 輸出單一執行檔與授權聲明到 dist\
 docs/                          設計規格、視覺設計說明、截圖
 ```
 
@@ -142,12 +143,13 @@ docs/                          設計規格、視覺設計說明、截圖
 | 套件 | 版本 | 用途 |
 |---|---|---|
 | Microsoft.Data.Sqlite | 10.0.12 | SQLite 存取 |
+| SQLitePCLRaw.bundle_e_sqlite3 | 2.1.12 | Microsoft.Data.Sqlite 帶進來的 SQLite 繫結與原生程式庫 |
 | xunit | 2.9.3 | 單元測試（僅測試專案） |
 | xunit.runner.visualstudio | 3.1.4 | 測試執行器（僅測試專案） |
 | Microsoft.NET.Test.Sdk | 17.14.1 | 測試主機（僅測試專案） |
 | coverlet.collector | 6.0.4 | 涵蓋率收集（僅測試專案） |
 
-執行階段另外用到 .NET 內建的 WPF 與 WinForms（只用 `NotifyIcon` 做系統匣），沒有其他第三方相依。
+執行階段另外用到 .NET Desktop Runtime 內建的 WPF 與 WinForms（只用 `NotifyIcon` 做系統匣）。
 
 ---
 
@@ -160,4 +162,6 @@ docs/                          設計規格、視覺設計說明、截圖
 
 ## 授權
 
-[MIT](LICENSE)
+本專案自己的程式碼採用 [MIT](LICENSE)。
+
+`StopAnnoyingMe.exe` 裡的第三方元件與授權全文見 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)，其中 `apphost` 的授權不確定，該文件有說明。.NET Desktop Runtime 由你向 Microsoft 安裝，適用 Microsoft 的條款。
