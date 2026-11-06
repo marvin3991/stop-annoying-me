@@ -10,7 +10,7 @@
 
 | 元件 | 版本 | 授權 | 依據 |
 |---|---|---|---|
-| Microsoft.Data.Sqlite、Microsoft.Data.Sqlite.Core | 10.0.12 | MIT | 套件的 `.nuspec`；上游 `dotnet/dotnet` 的 `src/efcore/LICENSE.txt`（`.nuspec` 記的 commit `95017c7`） |
+| Microsoft.Data.Sqlite、Microsoft.Data.Sqlite.Core | 10.0.12 | MIT（套件標示 `© Microsoft Corporation. All rights reserved.`；授權全文的著作權行是 `Copyright (c) .NET Foundation and Contributors`） | 套件的 `.nuspec`；上游 `dotnet/dotnet` 的 `src/efcore/LICENSE.txt`（`.nuspec` 記的 commit `95017c7`） |
 | SQLitePCLRaw.bundle_e_sqlite3、core、lib.e_sqlite3、provider.e_sqlite3 | 2.1.12 | Apache-2.0（`Copyright 2014-2024 SourceGear, LLC`） | 套件的 `.nuspec`；上游 `ericsink/SQLitePCL.raw` 的 tag `v2.1.12` |
 | `e_sqlite3.dll`（SQLite 原生程式庫，來自 SQLitePCLRaw.lib.e_sqlite3，內含 SQLite 3.53.3） | 2.1.12 | SQLite 是公有領域（public domain） | <https://sqlite.org/copyright.html>；SQLitePCLRaw 的 NOTICE 也有這一段 |
 | .NET 應用程式主機（`apphost`，exe 最前面的啟動程式） | 10.0.12 | 不確定，見「不確定的項目」 | |
@@ -28,13 +28,18 @@ v1.0.0～v1.2.0 原本另外提供內含 Runtime 的 `StopAnnoyingMe-selfcontain
 - [Windows 授權說明](https://github.com/dotnet/core/blob/main/license-information-windows.md)只說沒有列出的檔案都是 MIT；nuget.org 上的 `Microsoft.NETCore.App.Host.win-x64` 10.0.12 也標 MIT。建置時用的 apphost 和這個套件是否逐位元相同沒有比對。
 - [License Information](https://github.com/dotnet/core/blob/main/license-information.md) 的 Redistribution 一節說，.NET runtime 有一部分會內嵌在應用程式裡，包含 executable host，應用程式適用 Product distributions 與 Package distributions 的條款；Windows 的 Product distributions 是 [.NET Library License](https://dotnet.microsoft.com/dotnet_library_license.htm)。
 
+另外兩點：
+
+- apphost 的匯入表有 Windows 的 `api-ms-win-crt-*`，沒有 `vcruntime140.dll`，所以 Visual C++ runtime 應該是靜態連結在 apphost 裡（推論）。這部分適用的條款沒有查到。
+- 如果 apphost 適用 MIT：`dotnet/runtime` 的第三方聲明有哪些段落和 apphost 有關，沒有審計。
+
 **SQLitePCLRaw 的 NOTICE 裡的 SQLCipher 與 OpenSSL 段落。** 下面照上游原文保留。v1.2.0 內含的 `e_sqlite3.dll`（SHA-256 `B7385D722C83FB52142A00477A726723745916D22A555711EE89834C1111FB2E`）用字串掃描沒有發現這兩者（`sqlcipher`、`openssl`、`libcrypto`、`HAS_CODEC` 都是 0 次），但沒有做完整的反組譯。
 
 ## 授權全文
 
 ### MIT License
 
-適用 Microsoft.Data.Sqlite、Microsoft.Data.Sqlite.Core。文字取自 `dotnet/dotnet` 在 commit `95017c7` 的 `src/efcore/LICENSE.txt`。
+適用 Microsoft.Data.Sqlite、Microsoft.Data.Sqlite.Core。文字取自 `dotnet/dotnet` 在 commit `95017c7` 的 `src/efcore/LICENSE.txt`。apphost 如果適用 MIT，也是這份文字：同一個 commit 的 `src/runtime/LICENSE.TXT` 去掉頭尾空白後逐字相同。
 
 ````text
 The MIT License (MIT)

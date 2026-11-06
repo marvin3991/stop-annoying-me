@@ -24,7 +24,10 @@ Runtime 要裝對版本，程式才會啟動：
 | 只有 .NET Runtime 10（少了 Desktop） | 不行 |
 | 只有 9 以前或 11 以後的版本 | 不行 |
 
-不行的時候，Windows 會跳出 .NET 的英文提示（You must install or update .NET to run this application），裡面有 Download it now。
+不行的時候會跳出 .NET 的英文提示視窗，裡面有 Download it now：
+
+- 什麼都沒裝：`You must install .NET Desktop Runtime to run this application.`
+- 裝了但少了 Desktop 或版本不對：`You must install or update .NET to run this application.`
 
 v1.0.0～v1.2.0 原本另外提供內含 Runtime 的 `StopAnnoyingMe-selfcontained.exe`，已經撤下。
 
